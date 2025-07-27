@@ -1,0 +1,64 @@
+import { useState, useEffect } from 'react';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
+
+export default function Home() {
+  const [joke, setJoke] = useState<{ setup: string; punchline: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const fetchJoke = async () => {
+    setLoading(true);
+    const res = await fetch('https://official-joke-api.appspot.com/random_joke');
+    const data = await res.json();
+    setJoke(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchJoke();
+  }, []);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (darkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  return (
+    <div className="min-h-screen bg-slate-200 dark:bg-slate-900 text-gray-900 dark:text-white p-4">
+      <header className="text-center py-6">
+        <h1 className="text-4xl font-bold">bahagia itu sederhana <small>[katanya..]</small></h1>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="mt-4 px-4 py-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black rounded-3xl hover:opacity-80 inline-flex items-center gap-2"
+        >
+          {darkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
+          Toggle {darkMode ? 'Light' : 'Dark'} Mode
+        </button>
+      </header>
+
+      <main className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
+        <h2 className="text-2xl font-semibold mb-4">celotehan receh..</h2>
+
+        {loading ? (
+          <p className="text-center text-gray-500">bentar liat primbon dulu...</p>
+        ) : (
+          <div>
+            <p className="text-lg mb-3 font-semibold">🧑🏽‍💻{joke?.setup}</p>
+            <p className="text-xl">👨‍💻{joke?.punchline}</p>
+          </div>
+        )}
+
+        <button
+          onClick={fetchJoke}
+          className="mt-6 px-4 py-2 bg-blue-400 text-white dark:bg-slate-600 rounded-lg hover:bg-blue-600"
+        >
+          senyumin lagi?😅 <small>klik!</small>
+        </button>
+      </main>
+    </div>
+  );
+}
